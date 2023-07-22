@@ -1,0 +1,37 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
+import Profile from "@components/Profile";
+
+const UserProfile = ({ params }) => {
+  const searchParams = useSearchParams();
+  const userName =
+    searchParams.get("name")[searchParams.get("name").length - 1] == "s"
+      ? searchParams.get("name") + "'"
+      : searchParams.get("name") + "'s";
+
+  const [userPosts, setUserPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const response = await fetch(`/api/users/${params?.id}/posts`);
+      const data = await response.json();
+
+      setUserPosts(data);
+    };
+
+    if (params?.id) fetchPosts();
+  }, [params.id]);
+
+  return (
+    <Profile
+      name={userName}
+      desc={`Welcome to ${userName}'s profile page. Explore all of ${userName}'s prompts...`}
+      data={userPosts}
+    />
+  );
+};
+
+export default UserProfile;
